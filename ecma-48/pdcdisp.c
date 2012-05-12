@@ -42,6 +42,19 @@ chtype acs_map[128] =
 
 #endif
 
+static void _set_attr( chtype attr, bool rev )
+{
+    short fg;
+    short bg;
+
+    PDC_pair_content( PAIR_NUMBER(attr), &fg, &bg );
+
+    /* Reverse flag = highlighted selection XOR A_REVERSE set */
+    rev ^= !!(attr & A_REVERSE);
+
+    printf( "\033[%d;%d;%d;%dm", fg+30, bg+40, (attr&A_BOLD)?1:22, (attr&A_BLINK)?5:25, (rev)?7:27 );
+}
+
 /**********************************************************************************
   DESCRIPTION
 
@@ -68,20 +81,33 @@ void PDC_gotoyx(int y, int x)
 
 void PDC_transform_line(int lineno, int x, int len, const chtype* srcp)
 {
-    int  j;
-    char out[len+1];
+    int    j;
+    char   out[len+1];
+    chtype prev_attr;
+    chtype attr;
+
+    prev_attr = srcp[0] & A_ATTRIBUTES;
+    attr      = prev_attr;
+
+    _set_attr( attr, FALSE );
 
     for (j = 0; j < len; j++)
     {
-  // A_BLINK
-  // printf( "\033[%dm", ( blinkon ) ? 5 : 25 );
       chtype ch = srcp[j];
+      attr      = ch & A_ATTRIBUTES;
+
 #ifdef CHTYPE_LONG
         if (ch & A_ALTCHARSET && !(ch & 0xff80))
         {
             ch = acs_map[ch & 0x7f];
         }
 #endif
+        if ( attr != prev_attr )
+        {
+            _set_attr( attr, FALSE );
+            prev_attr = attr;
+        }
+
         out[j] = ch & A_CHARTEXT; 
     }
     out[len] = 0;

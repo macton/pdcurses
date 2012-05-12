@@ -1,4 +1,4 @@
-#include <curses.h>
+#include <curspriv.h>
 #include <stdio.h>
 
 /**********************************************************************************
@@ -50,7 +50,12 @@ int PDC_curs_set(int visibility)
 
 int PDC_set_blink(bool blinkon)
 {
-  return (ERR);
+    if (pdc_color_started)
+    {
+        COLORS = 16;
+    }
+
+    return blinkon ? ERR : OK;
 }
 
 

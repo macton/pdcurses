@@ -1,7 +1,54 @@
 #include <curspriv.h>
 #include <string.h>
 
-static SCREEN _sp; 
+// For future reference if extending to 256 color mode:
+// http://lucentbeing.com/blog/that-256-color-thing/
+//
+// Anatomy of a Color Code
+//
+//   The general structure of a color code is:
+//
+//   code       :: ^[[valuem
+//   value      :: attributes;foreground;background
+//   attributes :: attribute;attributes
+//   attribute  :: 00|01|03|04|05|07|22|23|24|25|27
+//   foreground :: 38;05;color
+//   background :: 48;05;color
+//   color      :: 000-255
+// 
+//   Effect         #
+//   -------------- --
+//   Reset          00
+//   Bold           01
+//   Italic         03
+//   Underline      04
+//   Blink          05
+//   Reverse        07
+//   No Bold        22
+//   No Italic      23
+//   No Underline   24
+//   No Blink       25
+//   No Reverse     27
+//
+// # Print text normally, in color 214, which happens to be a nice orange.
+// $> echo "^[[38;05;214mHello, World"
+// 
+// # Make the same text bold.
+// $> echo "^[[(01);(38;05;214)mHello, World"
+// 
+// # Print underlined and italicized text, with normal foreground, and blue
+// # background.
+// $> echo "^[[(03;04);(48;05;20)mHello, World"
+// 
+// # Bold, blinking purple text.
+// $> echo "^[[(01;05);(38;05;93)mHello, World"
+// 
+// # Simple purple text on yellow background.
+// $> echo "^[[(38;05;93);(48;05;226)mHello, World"
+
+
+static SCREEN                         _sp; 
+static struct { short fg; short bg; } _color_pairs[ 256 ];
 
 /**********************************************************************************
   DESCRIPTION
@@ -54,6 +101,8 @@ int PDC_init_color(short color, short red, short green, short blue)
 
 void PDC_init_pair(short pair, short fg, short bg)
 {
+  _color_pairs[ pair ].fg = fg;
+  _color_pairs[ pair ].bg = bg;
 }
 
 
@@ -67,7 +116,10 @@ void PDC_init_pair(short pair, short fg, short bg)
 
 int PDC_pair_content(short pair, short *fg, short *bg)
 {
-    return (0);
+  *fg = _color_pairs[ pair ].fg;
+  *bg = _color_pairs[ pair ].bg;
+
+  return (OK);
 }
 
 
