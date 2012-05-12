@@ -12,7 +12,7 @@ osdir    := $(PDCURSES_SRCDIR)/ecma-48
 WARNINGS := -Wno-long-long -Wall -pedantic
 
 CFLAGS   := -std=c99 $(WARNINGS)
-CFLAGS   := -D_GNU_SOURCE
+CFLAGS   += -D_GNU_SOURCE
 CFLAGS   += -I..
 ifeq ($(DEBUG),Y)
 CFLAGS  += -g -O0 -DPDCDEBUG

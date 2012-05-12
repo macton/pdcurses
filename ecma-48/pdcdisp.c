@@ -52,7 +52,7 @@ static void _set_attr( chtype attr, bool rev )
     /* Reverse flag = highlighted selection XOR A_REVERSE set */
     rev ^= !!(attr & A_REVERSE);
 
-    printf( "\033[%d;%d;%d;%dm", fg+30, bg+40, (attr&A_BOLD)?1:22, (attr&A_BLINK)?5:25, (rev)?7:27 );
+    printf( "\033[%d;%d;%d;%d;%dm", fg+30, bg+40, (attr&A_BOLD)?1:22, (attr&A_BLINK)?5:25, (rev)?7:27 );
 }
 
 /**********************************************************************************
