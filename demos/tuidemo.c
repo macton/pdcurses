@@ -89,11 +89,13 @@ void showfile(char *fname)
 
             for (i = 0; i < bh - 1 && !ateof; i++)
             {
-                buf[0] = '\0';
-                fgets(buf, MAXSTRLEN, fp);
+                char* result;
 
-                if (strlen(buf))
-                    bodymsg(buf);
+                buf[0] = '\0';
+                result = fgets(buf, MAXSTRLEN, fp);
+
+                if (result && strlen(result))
+                    bodymsg(result);
                 else
                     ateof = TRUE;
             }
